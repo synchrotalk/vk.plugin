@@ -6,19 +6,70 @@ require_once('vendor/autoload.php');
 class vk extends connector
 {
   private $api;
+  private $appid;
+  private $secret;
 
   public function __construct()
   {
+    $vk = getjump\Vk\Core::getInstance();
+
+    $this->api = $vk->apiVersion('5.5');
   }
 
-  final public function log_in($username, $password)
+  final public function init($appid, $secret)
   {
-    throw new Exception("VK log_in todo");
+    $this->appid = $appid;
+    $this->secret = $secret;
+  }
+
+  final public function log_in($token, $not_used)
+  {
+    throw new Exception("VK rules is permitting log_in functionality, use sign_in token");
+  }
+
+  public function construct_auth_obj()
+  {
+    $scope =
+    [
+      'messages',
+      'offline',
+    ];
+
+    $auth = getjump\Vk\Auth::getInstance();
+
+    $auth
+      ->setAppId($this->appid)
+      ->setScope(implode(',', $scope))
+      ->setSecret($this->secret)
+      ->setRedirectUri("https://oauth.vk.com/blank.html");
+
+    return $auth;
+  }
+
+  final public function token_request_url()
+  {
+    $auth = $this->construct_auth_obj();
+
+    return $auth->getUrl();
+  }
+
+  final public function code_to_token($code)
+  {
+    $auth = $this->construct_auth_obj();
+
+    return $auth->getToken($code);
   }
 
   final public function sign_in($token)
   {
-    throw new Exception("VK sign_in todo");
+    $this->api->setToken($token);
+
+    return $this->current_user();
+  }
+
+  private function current_user()
+  {
+    return $this->api->request("account.getInfo");
   }
 
   final public function send_message($to, $what)
