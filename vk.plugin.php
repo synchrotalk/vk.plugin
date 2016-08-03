@@ -57,7 +57,7 @@ class vk extends connector
   {
     $auth = $this->construct_auth_obj();
 
-    return $auth->getToken($code);
+    return $auth->getToken($code)->token;
   }
 
   final public function sign_in($token)
@@ -77,9 +77,36 @@ class vk extends connector
     throw new Exception("VK send_message todo");
   }
 
-  final public function fetch_messages($thread)
+  final public function fetch_messages($thread_id)
   {
-    throw new Exception("VK fetch_messages todo");
+    $thread = $this->api->request("messages.getHistory",
+      [
+        "user_id" => $thread_id,
+      ])->fetchData();
+
+    return
+    [
+      "id" => $thread_id,
+      "title" => "TODO",
+      "muted" => false,
+      "items" => array_map(function($item)
+      {
+        return
+        [
+          "id" => $item->id,
+          "type" => "text",
+          "text" => $item->body,
+          "media" => null,
+          "author" => $item->from_id,
+          "snap" => $item->date,
+        ];
+      }, $thread->items),
+
+      "users" => "TODO",
+
+      "snap" => "TODO",
+      "seen" => "TODO",
+    ];
   }
 
   final public function mark_read($thread)
