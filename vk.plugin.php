@@ -74,7 +74,17 @@ class vk extends connector
 
   final public function send_message($to, $what)
   {
-    throw new Exception("VK send_message todo");
+    $params =
+    [
+      "message" => $what,
+    ];
+
+    if (is_int($to))
+      $params["user_id"] = $to;
+    else // use nick as destination
+      $params["domain"] = $to;
+
+    return $this->api->request("messages.send", $params)->fetchData();
   }
 
   final public function fetch_messages($thread_id)
