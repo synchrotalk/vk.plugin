@@ -84,6 +84,11 @@ class vk extends connector
         "user_id" => $thread_id,
       ])->fetchData();
 
+    return $thread_recognize($thread, $thread_id);
+  }
+
+  private function thread_recognize($thread, $thread_id = 0)
+  {
     return
     [
       "id" => $thread_id,
@@ -115,11 +120,44 @@ class vk extends connector
   }
 
 
-
-
   final public function threads()
   {
-    throw new Exception("VK threads todo");
+    $threads = $this->api->request("messages.getDialogs")->fetchData();
+
+    $inbox = [];
+
+    $inbox['unseen'] = -1; // TODO
+    $inbox['last_snap'] = 0; // TODO
+
+    $inbox['threads'] = array_map(function($thread)
+    {
+      return
+      [
+        "id" => $thread->user_id,
+        "title" => "TODO",
+        "muted" => false,
+        "items" => array_map(function($item)
+        {
+          return
+          [
+            "id" => $item->id,
+            "type" => "text",
+            "text" => $item->body,
+            "media" => null,
+            "author" => $item->from_id,
+            "snap" => $item->date,
+          ];
+        }, $thread->items),
+
+        "users" => "TODO",
+
+        "snap" => "TODO",
+        "seen" => "TODO",
+      ];
+      return $this->ThreadRecognize($thread);
+    }, $threads->items);
+
+    return $inbox;
   }
 
   final public function contacts()
