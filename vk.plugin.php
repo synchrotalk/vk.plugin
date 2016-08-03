@@ -69,7 +69,7 @@ class vk extends connector
 
   private function current_user()
   {
-    return $this->api->request("account.getInfo");
+    return $this->api->request("account.getInfo")->fetchData();
   }
 
   final public function send_message($to, $what)
