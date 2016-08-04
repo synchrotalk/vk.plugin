@@ -81,4 +81,40 @@ class converter
   {
     return new \synchrotalk\connector\objects\owner($fetched_owner);
   }
+
+  public function bunchof_users($array_of_users)
+  {
+    $ret = [];
+    foreach ($array_of_users as $fetched_user)
+      $ret[] = $this->owner($fetched_user);
+
+    return $ret;
+  }
+
+  public function user($fetched_user)
+  {
+    $user = new \synchrotalk\connector\objects\user($fetched_user->id);
+
+    $user->name =
+    [
+      $fetched_user->first_name,
+      $fetched_user->last_name,
+    ];
+
+    $user->nickname = $fetched_user->domain;
+
+    $user->avatars =
+    [
+      '50x50' => $fetched_user->photo_50,
+      '200x200' => $fetched_user->photo_200
+    ];
+
+    // online
+    // status
+    // last_seen->platform
+
+    $user->updated = $fetched_user->last_seen->time;
+
+    return $user;
+  }
 }

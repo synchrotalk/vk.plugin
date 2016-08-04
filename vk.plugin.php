@@ -1,6 +1,7 @@
 <?php namespace vk;
 
 require_once('synchrotalk.connector/connector.php');
+require_once('vk.converter.php');
 require_once('vendor/autoload.php');
 
 class vk extends synchrotalk\connector\connector
@@ -94,5 +95,36 @@ class vk extends synchrotalk\connector\connector
     $message_id = $this->api->request("messages.send", $params)->fetchData();
 
     return new \synchrotalk\connector\objects\thread($message_id);
+  }
+
+  final public /* user */ function user( /* user_id */ $userid )
+  {
+    return current($this->users([$userid]));
+  }
+
+  final public /* user[] */ function users( /* user_id[] */ $userids )
+  {
+    $fields =
+    [
+      'has_photo',
+      'photo_50',
+      'photo_200',
+      'domain',
+      'last_seen',
+      'online',
+      'status',
+    ];
+
+    $params =
+    [
+      'user_ids' => implode(',', $userids),
+      'fields' => implode(',', $fields),
+      'name_case' => 'Nom',
+    ];
+
+    $users = $this->api->request("users.get", $params)->fetchData();
+
+    $converter = new converter();
+    return $converter->bunchof_users($users);
   }
 }
