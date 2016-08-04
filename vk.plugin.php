@@ -1,13 +1,12 @@
-<?php
+<?php namespace vk;
 
 require_once('synchrotalk.connector/connector.php');
 require_once('vendor/autoload.php');
 
-class vk extends connector
+class vk extends synchrotalk\connector\connector
 {
   private $api;
-  private $appid;
-  private $secret;
+  private $token;
 
   public function __construct()
   {
@@ -16,53 +15,12 @@ class vk extends connector
     $this->api = $vk->apiVersion('5.5');
   }
 
-  final public function init($appid, $secret)
+  final public function init($config)
+  {}
+
+  final public /* user */ function sign_in($token)
   {
-    $this->appid = $appid;
-    $this->secret = $secret;
-  }
-
-  final public function log_in($token, $not_used)
-  {
-    throw new Exception("VK rules is permitting log_in functionality, use sign_in token");
-  }
-
-  public function construct_auth_obj()
-  {
-    $scope =
-    [
-      'messages',
-      'offline',
-    ];
-
-    $auth = getjump\Vk\Auth::getInstance();
-
-    $auth
-      ->setAppId($this->appid)
-      ->setScope(implode(',', $scope))
-      ->setSecret($this->secret)
-      ->setRedirectUri("https://oauth.vk.com/blank.html");
-
-    return $auth;
-  }
-
-  final public function token_request_url()
-  {
-    $auth = $this->construct_auth_obj();
-
-    return $auth->getUrl();
-  }
-
-  final public function code_to_token($code)
-  {
-    $auth = $this->construct_auth_obj();
-
-    return $auth->getToken($code)->token;
-  }
-
-  final public function sign_in($token)
-  {
-    $this->api->setToken($token);
+    $this->token = $token;
 
     return $this->current_user();
   }
@@ -72,8 +30,36 @@ class vk extends connector
     return $this->api->request("account.getInfo")->fetchData();
   }
 
-  final public function send_message($to, $what)
+  final public /* thread[] */ function threads()
   {
+    $threads = $this->api->request("messages.getDialogs")->fetchData();
+
+    $converter = new converter();
+    return $converter->bunchof_threads($threads->items);
+  }
+
+  public /* message[] */ function messages( /* string */ $thread_id, /* int */ $skip_pages = 0)
+  {
+    $page_size = 30;
+
+    $thread = $this->api->request("messages.getHistory",
+      [
+        "user_id" => $thread_id,
+        "count" => $page_size,
+        "offset" => $page_size * $skip_pages,
+      ])->fetchData();
+
+    $converter = new converter();
+    return $converter->bunchof_messages($thread->items);
+  }
+
+
+  final public function message_send($to, $what)
+  {
+    if (!is_string($what))
+      throw new Exception("VK: Attachments for vk not yet implemented");
+
+
     $params =
     [
       "message" => $what,
@@ -84,94 +70,8 @@ class vk extends connector
     else // use nick as destination
       $params["domain"] = $to;
 
-    return $this->api->request("messages.send", $params)->fetchData();
-  }
+    $message_id = $this->api->request("messages.send", $params)->fetchData();
 
-  final public function fetch_messages($thread_id)
-  {
-    $thread = $this->api->request("messages.getHistory",
-      [
-        "user_id" => $thread_id,
-      ])->fetchData();
-
-    return $thread_recognize($thread, $thread_id);
-  }
-
-  private function thread_recognize($thread, $thread_id = 0)
-  {
-    return
-    [
-      "id" => $thread_id,
-      "title" => "TODO",
-      "muted" => false,
-      "items" => array_map(function($item)
-      {
-        return
-        [
-          "id" => $item->id,
-          "type" => "text",
-          "text" => $item->body,
-          "media" => null,
-          "author" => $item->from_id,
-          "snap" => $item->date,
-        ];
-      }, $thread->items),
-
-      "users" => "TODO",
-
-      "snap" => "TODO",
-      "seen" => "TODO",
-    ];
-  }
-
-  final public function mark_read($thread)
-  {
-    throw new Exception("VK mark_read todo");
-  }
-
-
-  final public function threads()
-  {
-    $threads = $this->api->request("messages.getDialogs")->fetchData();
-
-    $inbox = [];
-
-    $inbox['unseen'] = -1; // TODO
-    $inbox['last_snap'] = 0; // TODO
-
-    $inbox['threads'] = array_map(function($thread)
-    {
-      return
-      [
-        "id" => $thread->user_id,
-        "title" => "TODO",
-        "muted" => false,
-        "items" => array_map(function($item)
-        {
-          return
-          [
-            "id" => $item->id,
-            "type" => "text",
-            "text" => $item->body,
-            "media" => null,
-            "author" => $item->from_id,
-            "snap" => $item->date,
-          ];
-        }, $thread->items),
-
-        "users" => "TODO",
-
-        "snap" => "TODO",
-        "seen" => "TODO",
-      ];
-      return $this->ThreadRecognize($thread);
-    }, $threads->items);
-
-    return $inbox;
-  }
-
-  final public function contacts()
-  {
-    throw new Exception("VK contacts todo");
+    return new \synchrotalk\connector\objects\thread($message_id);
   }
 }

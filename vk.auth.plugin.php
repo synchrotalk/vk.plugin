@@ -15,7 +15,7 @@ class auth extends synchrotalk\connector\auth
     $this->appsecret = $config['appsecret'];
   }
 
-  final public /* user */ function sign_in( /* string */ $token)
+  final public function sign_in( /* string */ $token)
   {
     $this->token = $token;
   }
