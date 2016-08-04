@@ -53,22 +53,43 @@ class vk extends synchrotalk\connector\connector
     return $converter->bunchof_messages($thread->items);
   }
 
+  final public /* object */ function message_send_first( /* user_id */ $to,  /* string or message */ $what )
+  {
+    return parent::message_send($to, $what);
+  }
 
-  final public function message_send($to, $what)
+  final /* object */ public function message_send($to, $what)
+  {
+    return $this->message_send_constructed($what, $this->threadid_to_address($to));
+  }
+
+  private function threadid_to_address($to)
+  {
+    $params = [];
+
+    if (is_int($to))
+      $params["user_id"] = $to;
+    else (!is_string($to))
+      throw new Exception("VK: Unrecognizible thread id");
+    else if ($to[0] == '#') // special symbol for group chats
+      $params["chat_id"] = substr($to, 1);
+    else // use nick as destination
+      $params["domain"] = $to;
+
+    return $params;
+  }
+
+  private function message_send_constructed($what, $address)
   {
     if (!is_string($what))
-      throw new Exception("VK: Attachments for vk not yet implemented");
-
+      throw new Exception("VK: Attachments not yet implemented");
 
     $params =
     [
       "message" => $what,
     ];
 
-    if (is_int($to))
-      $params["user_id"] = $to;
-    else // use nick as destination
-      $params["domain"] = $to;
+    $bundle = array_merge($params, $address);
 
     $message_id = $this->api->request("messages.send", $params)->fetchData();
 
