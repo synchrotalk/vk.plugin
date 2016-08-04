@@ -109,9 +109,20 @@ class converter
       '200x200' => $fetched_user->photo_200
     ];
 
-    // online
-    // status
-    // last_seen->platform
+    $user->online = !!$fetched_user->online;
+    $user->status = $fetched_user->status;
+
+    $platforms =
+    [
+      1 => 'mobile web',
+      2 => 'mobile ios',
+      3 => 'ios',
+      4 => 'mobile linux',
+      5 => 'mobile windows',
+      6 => 'windows',
+      7 => 'web',
+    ];
+    $user->platform = $platforms[$fetched_user->last_seen->platform];
 
     $user->updated = $fetched_user->last_seen->time;
 
