@@ -3,9 +3,9 @@
 require_once('synchrotalk.connector/connector.php');
 require_once('vk.converter.php');
 require_once('vendor/autoload.php');
-require_once('vk.auth.php');
+require_once('vk.auth.plugin.php');
 
-class vk extends synchrotalk\connector\connector
+class vk extends \synchrotalk\connector\connector
 {
   private $api;
   private $token;
@@ -76,7 +76,7 @@ class vk extends synchrotalk\connector\connector
 
     if (is_int($to))
       $params["user_id"] = $to;
-    else (!is_string($to))
+    else if (!is_string($to))
       throw new Exception("VK: Unrecognizible thread id");
     else if ($to[0] == '#') // special symbol for group chats
       $params["chat_id"] = substr($to, 1);
@@ -132,5 +132,10 @@ class vk extends synchrotalk\connector\connector
 
     $converter = new converter();
     return $converter->bunchof_users($users);
+  }
+
+  public /* string */ function nickname_to_userid( /* string */ $nickname )
+  {
+    throw new Exception("VK: Implement nickname_to_userid");
   }
 }

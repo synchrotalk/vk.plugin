@@ -3,7 +3,7 @@
 require_once('synchrotalk.connector/auth.php');
 require_once('vendor/autoload.php');
 
-class auth extends synchrotalk\connector\auth
+class auth extends \synchrotalk\connector\auth
 {
   public $token;
   private $appid;
