@@ -2,28 +2,32 @@
 
 require_once('synchrotalk.connector/connector.php');
 require_once('vk.converter.php');
-require_once('vendor/getjump/vk/src/getjump/Vk/Core.php');
 require_once('vk.auth.plugin.php');
+require_once(__DIR__.'/vendor/autoload.php');
 
 class vk extends \synchrotalk\connector\connector
 {
   private $api;
   private $token;
+  private $auth;
 
   public function __construct()
   {
     $vk = \getjump\Vk\Core::getInstance();
 
     $this->api = $vk->apiVersion('5.5');
+    $this->auth = new auth();
   }
 
   final public /* auth */ function auth()
   {
-    return new auth();
+    return $this->auth;
   }
 
   final public function init($config)
-  {}
+  {
+    $this->auth->init($config);
+  }
 
   final public /* user */ function sign_in($token)
   {
