@@ -40,7 +40,9 @@ class vk extends \synchrotalk\connector\connector
 
   private function current_user()
   {
-    return $this->api->request("account.getProfileInfo")->fetchData();
+    $raw_data = $this->users([]);
+
+    return reset($raw_data);
   }
 
   final public /* thread[] */ function threads()
@@ -129,15 +131,17 @@ class vk extends \synchrotalk\connector\connector
 
     $params =
     [
-      'user_ids' => implode(',', $userids),
       'fields' => implode(',', $fields),
       'name_case' => 'Nom',
     ];
 
+    if (!empty($userids))
+      $params['user_ids'] = implode(',', $userids);
+
     $users = $this->api->request("users.get", $params)->fetchData();
 
     $converter = new converter();
-    return $converter->bunchof_users($users);
+    return $converter->bunchof_users($users->items);
   }
 
   public /* string */ function nickname_to_userid( /* string */ $nickname )

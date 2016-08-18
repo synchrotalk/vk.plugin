@@ -86,7 +86,7 @@ class converter
   {
     $ret = [];
     foreach ($array_of_users as $fetched_user)
-      $ret[] = $this->owner($fetched_user);
+      $ret[] = $this->user($fetched_user);
 
     return $ret;
   }
