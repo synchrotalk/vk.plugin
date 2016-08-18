@@ -33,12 +33,14 @@ class vk extends \synchrotalk\connector\connector
   {
     $this->token = $token;
 
+    $this->api->setToken($token);
+
     return $this->current_user();
   }
 
   private function current_user()
   {
-    return $this->api->request("account.getInfo")->fetchData();
+    return $this->api->request("account.getProfileInfo")->fetchData();
   }
 
   final public /* thread[] */ function threads()
