@@ -23,13 +23,23 @@ class converter
   {
     $thread = new \synchrotalk\connector\objects\thread($fetched_thread->user_id);
 
-    $thread->title = '';
+    $thread->title = $fetched_thread->title;
     $thread->is_muted = false;
 
     $thread->users = $this->bunchof_owners([$fetched_thread->user_id]);
     $thread->owner = $this->owner($fetched_thread->user_id);
-    $thread->last_messages = $this->bunchof_messages($fetched_thread->items);
 
+    $my_id = 0; // TODO: Fill with real id
+
+    $virtual_message =
+    [
+      'body' => $fetched_thread->body,
+      'from_id' => $fetched_thread->out
+        ? $my_id : $fetched_thread->user_id,
+    ];
+
+    $thread->last_messages =
+      $this->bunchof_messages([(object)$virtual_message]);
     return $thread;
   }
 
@@ -42,7 +52,18 @@ class converter
 
     $thread->users = $this->bunchof_owners($fetched_thread->chat_active);
     $thread->owner = $this->owner($fetched_thread->admin_id);
-    $thread->last_messages = $this->bunchof_messages($fetched_thread->items);
+
+    $my_id = 0; // TODO: Fill with real id
+
+    $virtual_message =
+    [
+      'body' => $fetched_thread->body,
+      'from_id' => $fetched_thread->out
+        ? $my_id : $fetched_thread->user_id,
+    ];
+
+    $thread->last_messages =
+      $this->bunchof_messages([(object)$virtual_message]);
 
     return $thread;
   }
@@ -50,6 +71,7 @@ class converter
   public function bunchof_messages($array_of_messages)
   {
     $ret = [];
+
     foreach ($array_of_messages as $fetched_message)
       $ret[] = $this->message($fetched_message);
 
@@ -60,10 +82,10 @@ class converter
   {
     $message = new \synchrotalk\connector\objects\message($fetched_message->id);
     $message->attachements = [];
-    $message->text = $item->body;
+    $message->text = $fetched_message->body;
 
-    $message->owner = $this->owner($item->from_id);
-    $message->created = $item->date;
+    $message->owner = $this->owner($fetched_message->from_id);
+    $message->created = $fetched_message->date;
 
     return $message;
   }
