@@ -123,6 +123,8 @@ class vk extends \synchrotalk\connector\connector
       'has_photo',
       'photo_50',
       'photo_200',
+      'photo_400_orig',
+      'photo_max_orig',
       'domain',
       'last_seen',
       'online',

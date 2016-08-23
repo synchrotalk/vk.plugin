@@ -128,7 +128,9 @@ class converter
     $user->avatars =
     [
       '50x50' => $fetched_user->photo_50,
-      '200x200' => $fetched_user->photo_200
+      '200x200' => $fetched_user->photo_200,
+      '400x400' => $fetched_user->photo_400_orig,
+      '1000x1000' => $fetched_user->photo_max_orig,
     ];
 
     $user->online = !!$fetched_user->online;
