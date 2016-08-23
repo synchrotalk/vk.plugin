@@ -29,13 +29,13 @@ class vk extends \synchrotalk\connector\connector
     $this->auth->init($config);
   }
 
-  final public /* user */ function sign_in($token)
+  final public /* bool */ function sign_in($token)
   {
     $this->token = $token;
 
     $this->api->setToken($token);
 
-    return $this->current_user();
+    return true;
   }
 
   private function current_user()
