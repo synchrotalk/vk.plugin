@@ -23,7 +23,8 @@ class converter
   {
     $thread = new \synchrotalk\connector\objects\thread($fetched_thread->user_id);
 
-    $thread->title = $fetched_thread->title;
+    // I am checked twice. For single user it is '...'
+    $thread->title = null;
     $thread->is_muted = false;
 
     $thread->users = $this->bunchof_owners([$fetched_thread->user_id]);
@@ -36,6 +37,7 @@ class converter
       'body' => $fetched_thread->body,
       'from_id' => $fetched_thread->out
         ? $my_id : $fetched_thread->user_id,
+      'date' => $fetched_thread->date,
     ];
 
     $thread->last_messages =
