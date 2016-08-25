@@ -53,7 +53,7 @@ class vk extends \synchrotalk\connector\connector
     return $converter->bunchof_threads($threads->items);
   }
 
-  public /* message[] */ function messages( /* string */ $thread_id, /* int */ $skip_pages = 0)
+  final public /* message[] */ function messages( /* string */ $thread_id, /* int */ $skip_pages = 0)
   {
     $page_size = 30;
 
@@ -106,14 +106,16 @@ class vk extends \synchrotalk\connector\connector
 
     $bundle = array_merge($params, $address);
 
-    $message_id = $this->api->request("messages.send", $params)->fetchData();
+    $message_id = $this->api->request("messages.send", $bundle)->fetchData();
 
     return new \synchrotalk\connector\objects\thread($message_id);
   }
 
   final public /* user */ function user( /* user_id */ $userid )
   {
-    return current($this->users([$userid]));
+    if ($userid)
+      $userid = [$userid];
+    return current($this->users($userid));
   }
 
   final public /* user[] */ function users( /* user_id[] */ $userids )

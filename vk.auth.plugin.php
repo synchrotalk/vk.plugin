@@ -18,6 +18,7 @@ class auth extends \synchrotalk\connector\auth
   final public function sign_in( /* string */ $token)
   {
     $this->token = $token;
+    return true;
   }
 
   final public /* string[] */ function redirect_auth_requirments()
