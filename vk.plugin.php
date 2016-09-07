@@ -38,6 +38,11 @@ class vk extends \synchrotalk\connector\connector
     return true;
   }
 
+  final public /* token */ function get_token()
+  {
+    return $this->token;
+  }
+
   private function current_user()
   {
     $raw_data = $this->users([]);
