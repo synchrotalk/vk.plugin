@@ -42,6 +42,8 @@ class converter
 
     $thread->last_messages =
       $this->bunchof_messages([(object)$virtual_message]);
+    $thread->updated = $thread->last_messages[0]->created;
+
     return $thread;
   }
 
@@ -66,6 +68,7 @@ class converter
 
     $thread->last_messages =
       $this->bunchof_messages([(object)$virtual_message]);
+    $thread->updated = $thread->last_messages[0]->created;
 
     return $thread;
   }
