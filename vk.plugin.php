@@ -113,7 +113,7 @@ class vk extends \synchrotalk\connector\connector
 
     $message_id = $this->api->request("messages.send", $bundle)->fetchData();
 
-    return new \synchrotalk\connector\objects\thread($message_id);
+    return new \synchrotalk\connector\objects\abstract_object($message_id);
   }
 
   final public /* user */ function user( /* user_id */ $userid )
