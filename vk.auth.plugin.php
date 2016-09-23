@@ -28,8 +28,18 @@ class auth extends \synchrotalk\connector\auth
     return
     [
       [
-        'type' => 'modal',
-        'data' => 'Please authorize access and then give us code. This is the only way to send personal messages from your account. Fear not!',
+        'type' => 'form',
+        'data' =>
+        [
+          [
+            'type' => 'info',
+            'text' => 'Please authorize access and then give us code. This is the only way to send personal messages from your account. Fear not!',
+          ],
+          [
+            'type' => 'info',
+            'text' => 'Code looks like this: https&colon//oauth.vk.com/blank.html#code=9c7fd699741f83a120',
+          ],
+        ],
       ],
       [
         'type' => 'redirect',
