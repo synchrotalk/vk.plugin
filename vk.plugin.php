@@ -157,4 +157,13 @@ class vk extends \synchrotalk\connector\connector
   {
     throw new Exception("VK: Implement nickname_to_userid");
   }
+
+
+  final public /* string */ function nickname_to_link( /* string */ $nickname )
+  {
+    if (is_numeric($nickname))
+      $nickname = "id{$nickname}";
+
+    return "https://vk.com/{$nickname}";
+  }
 }
