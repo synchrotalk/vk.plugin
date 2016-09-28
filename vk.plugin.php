@@ -161,9 +161,7 @@ class vk extends \synchrotalk\connector\connector
 
   final public /* string */ function nickname_to_link( /* string */ $nickname )
   {
-    if (is_numeric($nickname))
-      $nickname = "id{$nickname}";
-
-    return "https://vk.com/{$nickname}";
+    $converter = new converter();
+    return $converter->nickname_to_link($nickname);
   }
 }

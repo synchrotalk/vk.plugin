@@ -129,6 +129,7 @@ class converter
     ];
 
     $user->nickname = $fetched_user->domain;
+    $user->profile_link = $this->nickname_to_link($user->nickname);
 
     $user->avatars =
     [
@@ -156,5 +157,13 @@ class converter
     $user->updated = $fetched_user->last_seen->time;
 
     return $user;
+  }
+
+  public function nickname_to_link( $nickname )
+  {
+    if (is_numeric($nickname))
+      $nickname = "id{$nickname}";
+
+    return "https://vk.com/{$nickname}";
   }
 }
